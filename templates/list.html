@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<style>
+    table, th, td {
+      border: 1px solid black;
+    }
+    </style>
+    <table>
+    <tbody>
+    {% for row in tests %}
+      <tr>
+        <td>{{ row.question }}</td>
+        <td>{{ row.answer }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    </table>

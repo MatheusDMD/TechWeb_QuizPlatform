@@ -8,14 +8,14 @@ db = SQLAlchemy(app)
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    return render_template('index.html')
 
 class Test(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	question = db.Column(db.String(1000),  unique=False)
-	answer = db.Column(db.String(1000), unique=False)
+	question = db.Column(db.String(100),  unique=False)
+	answer = db.Column(db.String(100), unique=False)
 
-	def __init__(self, question, answer, number):
+	def __init__(self, question, answer):
     	   self.question = question
     	   self.answer = answer
 
@@ -27,23 +27,14 @@ def add_user():
     	test = Test(question=question, answer=answer)
     	db.session.add(test)
     	db.session.commit()
-    	return " dado inserido"
-   return '''
-    	<form action="" method="post">
-			<p>numero: <input type=number name=number style="height: 100px;">
-        	<p>pergunta: <input type=text name=question style="height: 100px;">
-        	<p>resposta: <input type=text name=answer style="height: 100px;">
-        	<p><input type=submit value=Inserir>
-    	</form>
-	'''
+        tests = Test.query.all()
+    	return render_template('quizlist.html',tests=tests)
+   return render_template('create.html')
 
-@app.route('/read/<username>')
-def read_user(username):
-	user = User.query.filter_by(username=username).first()
-	if(user):
-    	  return user.username + " e-mail: &lt;" + user.email + "&gt;"
-	else:
-    	  return "Usuário não encontrado",404
+@app.route('/quizlist')
+def list_user():
+	tests = Test.query.all()
+	return render_template('quizlist.html',tests=tests)
 
 db.create_all()
 
