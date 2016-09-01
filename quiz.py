@@ -58,6 +58,15 @@ class MCQuestion(db.Model):
 def register():
     if request.method == 'POST':
 		mode = request.args.get('mode')
+		if mode=='login':
+			email = request.form["login_email"]
+			password = request.form["login_password"]
+			#voltar pra cá e ler como se
+			login_user = User.query.filter_by(email=email).first()
+			if login_user.password == password:
+				return render_template('index.html', username=login_user.username)
+			else:
+				return 'wrong password'
 		if mode=='register':
 			first_name = request.form["first_name"]
 	        last_name = request.form["last_name"]
@@ -67,23 +76,13 @@ def register():
 	     	db.session.add(user)
 	     	db.session.commit()
 	        return render_template('index.html', username=user.username)
-		if mode=='login':
-			email = request.form["login_email"]
-			password = request.form["login_password"]
-			#voltar pra cá e ler como se
-			login_user = User.query.filter_by(email=email).first()
-			return "{0}".format(login_user.email)
-			"""if login_user.password == password:
-				return render_template('index.html', username=login_user.username)
-			else:
-				return 'wrong password'"""
     return render_template('login.html')
 
 @app.route('/main')
 def main():
     return render_template('index.html')
 
-@app.route('/<username>/create', methods=['GET', 'POST'])
+@app.route('/create', methods=['GET', 'POST'])
 def create_quiz():
    if request.method == 'POST':
     	title = request.form["title"]
