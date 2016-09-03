@@ -31,9 +31,9 @@ class DQuestion(db.Model):
     question = db.Column(db.String(100), unique=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
-    def __init__(self, question, quiz):
+    def __init__(self, question, quiz_id):
         self.question = question
-        self.user_id = quiz.id
+        self.quiz_id = quiz_id
 
 class MCQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,7 +52,7 @@ class MCQuestion(db.Model):
            self.alt3 = alt3
            self.alt4 = alt4
            self.correct_alt = correct_alt
-           self.user_id = quiz.id
+           self.quiz_id = quiz.id
 
 @app.route('/', methods=['GET', 'POST'])
 def register():
@@ -64,7 +64,7 @@ def register():
 			#voltar pra cá e ler como se
 			login_user = User.query.filter_by(email=email).first()
 			if login_user.password == password:
-				return render_template('index.html', username=login_user.username)
+				return render_template('index.html', id=str(login_user.id))
 			else:
 				return 'wrong password'
 		if mode=='register':
@@ -75,24 +75,34 @@ def register():
 	     	user = User(username=first_name+' '+last_name, email=email, password=password)
 	     	db.session.add(user)
 	     	db.session.commit()
-	        return render_template('index.html', username=user.username)
+	        return render_template('index.html', id=str(user.id))
     return render_template('login.html')
 
 @app.route('/main')
 def main():
     return render_template('index.html')
 
-@app.route('/create', methods=['GET', 'POST'])
-def create_quiz():
+@app.route('/create/<user_id>', methods=['GET', 'POST'])
+def create_quiz(user_id):
    if request.method == 'POST':
-    	title = request.form["title"]
-    	theme = request.form["theme"]
-    	quiz = Quiz(title=title, theme=theme, username=username)
-    	db.session.add(quiz)
-    	db.session.commit()
-        quizs = Quiz.query.all()
-    	return render_template('create-question.html',quiz=quizs)
+	   title = request.form["title"]
+	   theme = request.form["theme"];current_user = User.query.get(int(user_id))
+	   quiz = Quiz(title=title, theme=theme, user=current_user)
+	   db.session.add(quiz)
+	   db.session.commit()#return User.query.get(quiz.user_id).email
+	   return render_template('question.html')
    return render_template('create.html')
+
+@app.route('/question', methods=['GET','POST'])
+def create_question():
+	if request.method == 'POST':
+		question = request.form["queston"]
+ 	   	#answer = request.form["answer"]
+		d_question = DQuestion(question=question,quiz_id=4)
+		db.session.add(d_question)
+		db.session.commit()
+		return render_template('question.html')
+	return render_template('question.html')
 
 @app.route('/quizlist')
 def list_quiz():
