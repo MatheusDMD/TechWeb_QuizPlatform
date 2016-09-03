@@ -96,7 +96,8 @@ def create_quiz(user_id):
 @app.route('/question', methods=['GET','POST'])
 def create_question():
 	if request.method == 'POST':
-		question = request.form["queston"]
+		question = "str"
+		#question = request.form["question"]
  	   	#answer = request.form["answer"]
 		d_question = DQuestion(question=question,quiz_id=4)
 		db.session.add(d_question)
@@ -106,7 +107,7 @@ def create_question():
 
 @app.route('/quizlist')
 def list_quiz():
-	quizs = Quiz.query.all()
+	quizs = Quiz.query.filter_by(user_id=1).all()
 	return render_template('quizlist.html',quizs=quizs)
 
 @app.route('/userlist')
