@@ -96,12 +96,12 @@ def create_quiz(user_id):
 @app.route('/question', methods=['GET','POST'])
 def create_question():
 	if request.method == 'POST':
-		question = "str"
-		#question = request.form["question"]
- 	   	#answer = request.form["answer"]
-		d_question = DQuestion(question=question,quiz_id=4)
-		db.session.add(d_question)
-		db.session.commit()
+		print(request.values)
+		question = request.form["question"]
+ 	   	answer = request.form["answer"]
+		#d_question = DQuestion(question=question,quiz_id=4)
+		#db.session.add(d_question)
+		#db.session.commit()
 		return render_template('question.html')
 	return render_template('question.html')
 
