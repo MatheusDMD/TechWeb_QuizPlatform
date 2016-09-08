@@ -56,7 +56,8 @@ class MCQuestion(db.Model):
 
 @app.route('/stats')
 def stats():
-	return render_template('stats.html')
+	list_stats = [ 0,1,2,3]
+	return render_template('stats.html', lista=lista_stats)
 
 @app.route('/', methods=['GET', 'POST'])
 def register():
