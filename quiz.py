@@ -54,6 +54,10 @@ class MCQuestion(db.Model):
            self.correct_alt = correct_alt
            self.quiz_id = quiz.id
 
+@app.route('/stats')
+def stats():
+	return render_template('stats.html')
+
 @app.route('/', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
