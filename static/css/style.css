@@ -1,4 +1,4 @@
-*, *:before, *:after {
+ *, *:before, *:after {
   box-sizing: border-box;
 }
 
@@ -7,8 +7,7 @@ html {
 }
 
 body {
-  background: #c1bdba;
-  font-family: 'Titillium Web', sans-serif;
+  background-image: url("wood.jpg");
 }
 
 a {
@@ -22,7 +21,7 @@ a:hover {
 }
 
 .form {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.62);
   padding: 40px;
   max-width: 600px;
   margin: 40px auto;
@@ -45,7 +44,7 @@ a:hover {
   text-decoration: none;
   padding: 15px;
   background: rgba(160, 179, 176, 0.25);
-  color: #a0b3b0;
+  color: #ffffff;
   font-size: 20px;
   float: left;
   width: 50%;
@@ -157,14 +156,14 @@ textarea {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .1em;
-  background: #ff1a1a;
+  background: rgba(160, 179, 176, 0.25);
   color: #ffffff;
   -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
   -webkit-appearance: none;
 }
 .button:hover, .button:focus {
-  background: #179b77;
+  background: #ff1a1a;
 }
 
 .button-block {
