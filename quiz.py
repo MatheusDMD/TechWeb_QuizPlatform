@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template, make_response
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -45,14 +45,19 @@ class mcquestion(db.Model):
     correct_alt = db.Column(db.Integer, unique=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
-    def __init__(self, question,alt1,alt2,alt3,alt4,correct_alt,quiz_id):
+    def __init__(self, question,alt1,alt2,alt3,alt4,correct_alt,quiz):
     	   self.question = question
            self.alt1 = alt1
            self.alt2 = alt2
            self.alt3 = alt3
            self.alt4 = alt4
            self.correct_alt = correct_alt
-           self.quiz_id = quiz_id
+           self.quiz_id = quiz.id
+
+@app.route('/stats')
+def stats():
+	list_stats = [ 0,1,2,3]
+	return render_template('stats.html', lista=lista_stats)
 
 @app.route('/', methods=['GET', 'POST'])
 def register():
@@ -64,9 +69,7 @@ def register():
 			#voltar pra cá e ler como se
 			login_user = User.query.filter_by(email=email).first()
 			if login_user.password == password:
-				next_page = make_response(render_template('index.html'))
-				next_page.set_cookie('user_id', str(login_user.id))
-				return next_page
+				return render_template('index.html', id=str(login_user.id))
 			else:
 				return 'wrong password'
 		if mode=='register':
@@ -84,10 +87,9 @@ def register():
 def main():
     return render_template('index.html')
 
-@app.route('/create', methods=['GET', 'POST'])
-def create_quiz():
+@app.route('/create/<user_id>', methods=['GET', 'POST'])
+def create_quiz(user_id):
    if request.method == 'POST':
-	   user_id = request.cookies.get('user_id')
 	   title = request.form["title"]
 	   theme = request.form["theme"];current_user = User.query.get(int(user_id))
 	   quiz = Quiz(title=title, theme=theme, user_id=current_user.id)
@@ -95,7 +97,7 @@ def create_quiz():
 	   resp.set_cookie('quiz_id', str(quiz.id))
 	   db.session.add(quiz)
 	   db.session.commit()#return User.query.get(quiz.user_id).email
-	   return resp
+	   return render_template('question.html')
    return render_template('create.html')
 
 @app.route('/question', methods=['GET','POST'])
