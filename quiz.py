@@ -21,12 +21,12 @@ class Quiz(db.Model):
 	title = db.Column(db.String(100), unique=False)
 	theme = db.Column(db.String(100), unique=False);user_id = db.Column(db.Integer, db.ForeignKey('user.id'));
 
-	def __init__(self,title, theme, user):
+	def __init__(self,title, theme, user_id):
     	   self.title = title
     	   self.theme = theme
-           self.user_id = user.id
+           self.user_id = user_id
 
-class DQuestion(db.Model):
+class dquestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(100), unique=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
@@ -35,7 +35,7 @@ class DQuestion(db.Model):
         self.question = question
         self.quiz_id = quiz_id
 
-class MCQuestion(db.Model):
+class mcquestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question = db.Column(db.String(100), unique=False)
     alt1 = db.Column(db.String(100), unique=False)
@@ -90,7 +90,7 @@ def create_quiz():
 	   user_id = request.cookies.get('user_id')
 	   title = request.form["title"]
 	   theme = request.form["theme"];current_user = User.query.get(int(user_id))
-	   quiz = Quiz(title=title, theme=theme, user=current_user)
+	   quiz = Quiz(title=title, theme=theme, user_id=current_user.id)
 	   resp = make_response(render_template('question.html'))
 	   resp.set_cookie('quiz_id', str(quiz.id))
 	   db.session.add(quiz)
@@ -109,21 +109,21 @@ def create_question():
 		alt4 = request.form["alt4"]
 		correct_alt = request.form["check"]
 		quiz_id = request.cookies.get('quiz_id')
-		m_question = MCQuestion(question=question,alt1=alt1,alt2=alt2,alt3=alt3,alt4=alt4,correct_alt=correct_alt,quiz_id=quiz_id)
+		m_question = mcquestion(question=question,alt1=alt1,alt2=alt2,alt3=alt3,alt4=alt4,correct_alt=correct_alt,quiz_id=quiz_id)
 		db.session.add(m_question)
 		db.session.commit()
 		return render_template('index.html')
 	return render_template('question.html')
 
-@app.route('/quizlist')
+@app.route('/quizlist', methods=['GET','POST'])
 def list_quiz():
-	user_id = request.cookies.get('user_id')
-	quizs = Quiz.query.filter_by(user_id=user_id).all()
 	if request.method == 'POST':
-		on_quiz = False
-		quiz_id = request.form["quiz"]
-		quiz_questions = Quiz.query.filter_by(quiz_id=quiz_id).all()
-		return render_template('quizlist.html',quizs=quiz)
+		quiz_id = request.form["select"]
+		quiz_questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
+		return render_template('questionlist.html',questions=quiz_questions)
+	else:
+		user_id = request.cookies.get('user_id')
+		quizs = Quiz.query.filter_by(user_id=user_id).all()
 	return render_template('quizlist.html',quizs=quizs)
 
 @app.route('/userlist')
@@ -133,5 +133,6 @@ def list_user():
 
 db.create_all()
 
+port = os.getenv('PORT', '5000')
 if __name__ == "__main__":
-	app.run()
+	app.run(host='0.0.0.0', port=int(port))

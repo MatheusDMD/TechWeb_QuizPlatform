@@ -68,15 +68,11 @@
           <h3>My Quiz</h3>
         </div>
         <div class="row">
-          <form method="post">
-            <select name="select" class="selectpicker form-control">
-              {% for row in quizs %}
-              <option href="#" value="{{row.id}}">{{ row.title }}</option>
+            <div class="list-group">
+              {% for row in questions %}
+              <a href="#" value="{{row.id}}" class="list-group-item">{{ row.value }}</a>
               {% endfor %}
-            </select>
-        </div>
-          <input class="btn btn btn-success" type=submit value="Questions &raquo;"></input>
-          </form>
+            </div>
         </div>
       <hr>
 
