@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, make_response, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -45,14 +46,25 @@ class mcquestion(db.Model):
     correct_alt = db.Column(db.Integer, unique=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
-    def __init__(self, question,alt1,alt2,alt3,alt4,correct_alt,quiz):
+    def __init__(self, question,alt1,alt2,alt3,alt4,correct_alt,quiz_id):
     	   self.question = question
            self.alt1 = alt1
            self.alt2 = alt2
            self.alt3 = alt3
            self.alt4 = alt4
            self.correct_alt = correct_alt
-           self.quiz_id = quiz.id
+           self.quiz_id = quiz_id
+
+class mcanswer(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	answer = db.Column(db.Integer, unique=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
+
+	def __init__(self,answer,user_id,quiz_id):
+		self.answer = answer
+		self.user_id = user_id
+		self.quiz_id = quiz_id
 
 @app.route('/stats')
 def stats():
@@ -69,7 +81,9 @@ def register():
 			#voltar pra cá e ler como se
 			login_user = User.query.filter_by(email=email).first()
 			if login_user.password == password:
-				return render_template('index.html', id=str(login_user.id))
+				next_page = make_response(render_template('index.html'))
+				next_page.set_cookie('user_id', str(login_user.id))
+				return next_page
 			else:
 				return 'wrong password'
 		if mode=='register':
@@ -87,17 +101,18 @@ def register():
 def main():
     return render_template('index.html')
 
-@app.route('/create/<user_id>', methods=['GET', 'POST'])
-def create_quiz(user_id):
+@app.route('/create', methods=['GET', 'POST'])
+def create_quiz():
    if request.method == 'POST':
 	   title = request.form["title"]
-	   theme = request.form["theme"];current_user = User.query.get(int(user_id))
-	   quiz = Quiz(title=title, theme=theme, user_id=current_user.id)
-	   resp = make_response(render_template('question.html'))
-	   resp.set_cookie('quiz_id', str(quiz.id))
+	   theme = request.form["theme"];
+	   user_id = request.cookies.get('user_id')
+	   quiz = Quiz(title=title, theme=theme, user_id=user_id)
 	   db.session.add(quiz)
 	   db.session.commit()#return User.query.get(quiz.user_id).email
-	   return render_template('question.html')
+	   resp = make_response(render_template('question.html'))
+	   resp.set_cookie('quiz_id', str(quiz.id))
+	   return resp
    return render_template('create.html')
 
 @app.route('/question', methods=['GET','POST'])
@@ -132,6 +147,47 @@ def list_quiz():
 def list_user():
 	users = User.query.all()
 	return render_template('quizlist.html',quizs=users)
+
+@app.route('/quiz/<quiz_id>', methods=['GET','POST'])
+def answer_quiz(quiz_id):
+	quiz_id2 = quiz_id.split('?')
+	question = mcquestion.query.filter_by(quiz_id=quiz_id2[0]).first()
+	quiz = Quiz.query.get(quiz_id2[0])
+	user_id = request.cookies.get('user_id')
+	if user_id == None:
+	    if request.method == 'POST':
+			mode = request.args.get('mode')
+			if mode=='login':
+				email = request.form["login_email"]
+				password = request.form["login_password"]
+				#voltar pra cá e ler como se
+				login_user = User.query.filter_by(email=email).first()
+				if login_user.password == password:
+					next_page = make_response(render_template('answerquiz.html'))
+					next_page.set_cookie('user_id', str(login_user.id))
+					return next_page
+				else:
+					return 'wrong password'
+			if mode=='register':
+				first_name = request.form["first_name"]
+		        last_name = request.form["last_name"]
+		        email = request.form["email"]
+		     	password = request.form["password"]
+		     	user = User(username=first_name+' '+last_name, email=email, password=password)
+		     	db.session.add(user)
+		     	db.session.commit();next_page2 = make_response(render_template('answerquiz.html'));next_page2.set_cookie('user_id', str(user.id))
+		        return next_page2
+	    return render_template('quicklogin.html')
+	else:
+		if request.method == 'POST':
+			answer = request.form['check']
+			user_id = request.cookies.get('user_id')
+			user_answer = mcanswer(answer=answer,user_id=user_id,quiz_id=quiz_id)
+			db.session.add(user_answer)
+			db.session.commit()
+			next_page2 = make_response(render_template('index.html'));next_page2.set_cookie('user_id', str(user_id))
+			return next_page2
+		return render_template('answerquiz.html',title=quiz.title,theme=quiz.theme,question=question.question,alt1=question.alt1,alt2=question.alt2,alt3=question.alt3,alt4=question.alt4)
 
 db.create_all()
 
