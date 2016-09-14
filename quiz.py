@@ -60,11 +60,13 @@ class mcanswer(db.Model):
 	answer = db.Column(db.Integer, unique=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
+	question_id = db.Column(db.Integer, db.ForeignKey('mcquestion.id'))
 
-	def __init__(self,answer,user_id,quiz_id):
+	def __init__(self,answer,user_id,quiz_id,question_id):
 		self.answer = answer
 		self.user_id = user_id
 		self.quiz_id = quiz_id
+		self.question_id = question_id
 
 @app.route('/stats')
 def stats():
@@ -143,6 +145,13 @@ def list_quiz():
 		quizs = Quiz.query.filter_by(user_id=user_id).all()
 	return render_template('quizlist.html',quizs=quizs)
 
+@app.route('/questionlist', methods=['GET','POST'])
+def list_questions():
+	if request.method == 'POST':
+		question_id = request.form["select"]
+		answer_list = mcanswer.query.filter_by(question_id=question_id).all()
+
+
 @app.route('/userlist')
 def list_user():
 	users = User.query.all()
@@ -182,7 +191,7 @@ def answer_quiz(quiz_id):
 		if request.method == 'POST':
 			answer = request.form['check']
 			user_id = request.cookies.get('user_id')
-			user_answer = mcanswer(answer=answer,user_id=user_id,quiz_id=quiz_id)
+			user_answer = mcanswer(answer=answer,user_id=user_id,quiz_id=quiz_id,question_id=1)
 			db.session.add(user_answer)
 			db.session.commit()
 			next_page2 = make_response(render_template('index.html'));next_page2.set_cookie('user_id', str(user_id))
