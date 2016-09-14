@@ -145,10 +145,11 @@ def list_quiz():
 		quizs = Quiz.query.filter_by(user_id=user_id).all()
 	return render_template('quizlist.html',quizs=quizs)
 
-@app.route('/questionlist', methods=['GET','POST'])
-def list_questions():
+@app.route('/stats', methods=['GET','POST'])
+def stats_view():
 	if request.method == 'POST':
 		question_id = request.form["select"]
+		question = mcquestion.query.get(question_id)
 		answer_list = mcanswer.query.filter_by(question_id=question_id).all()
 
 
