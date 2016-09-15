@@ -1,20 +1,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <title>CSS3 Charts-Global usage share of web browsers</title>
-<!--<link href="../static/css/stylesheet.css" rel="stylesheet" type="text/css" /> 	
-<link href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> 	
-<link href="../static/css/business-frontpage.css" rel="stylesheet" type="text/css" /> 	
+<!--<link href="../static/css/stylesheet.css" rel="stylesheet" type="text/css" />
+<link href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="../static/css/business-frontpage.css" rel="stylesheet" type="text/css" />
 <link href="../static/css/bootstrap.css" rel="stylesheet" type="text/css" /> -->
 
-<link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
 <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/bootstrap.min.css') }}">
 <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/business-frontpage.css') }}">
 <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/bootstrap.css') }}">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+<style>
+  h4.visible {
+      visibility: visible
+  }
+
+  h4.hidden {
+      visibility: hidden
+  }
+</style>
 
 </head>
-	
+
 <body>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
@@ -46,86 +59,42 @@
       </div>
       <!-- /.container -->
   </nav>
-<div id="wrapper">
-	<div id="header">
-		<p id="txt_title">Global usage share of web browsers</p>
-		<p id="txt_subtitle">Pure CSS3 experimental charts, no JavaScript &amp; zero image. Best viewed in Webkit browsers.</p>
-	</div>
+  <div class="container">
+      <hr>
+    <div class="row">
+      <h4 class="text-center {{visibility}}">{{title}}</h4>
+    </div>
+    <div class="row">
+      <div id="donut-example" style="height: 250px;"></div>
+    </div>
+      <h4 class="text-center" type>Your answer is: {{answer}}</h4>
+    <div class="block-center">
+      <ul class="list-group">
+        <li class="list-group-item {{active[0]}}">Alternative 1  -  {{alt1}}</li>
+        <li class="list-group-item {{active[1]}}">Alternative 2  -  {{alt2}}</li>
+        <li class="list-group-item {{active[2]}}">Alternative 3  -  {{alt3}}</li>
+        <li class="list-group-item {{active[3]}}">Alternative 4  -  {{alt4}}</li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    var percentages0 = '{{ percentages[0] }}';
+    var percentages1 = '{{ percentages[1] }}';
+    var percentages2 = '{{ percentages[2] }}';
+    var percentages3 = '{{ percentages[3] }}';
+    var usage_graph = new Morris.Donut({
+      element: 'donut-example',
+      data: [
+        {label: "Alternative 1", value: percentages0},
+        {label: "Alternative 2", value: percentages1},
+        {label: "Alternative 3", value: percentages2},
+        {label: "Alternative 4", value: percentages3}
+      ]
+    });
 
-	<div id="q2_2010">
-	<div id="q1_2010">
-	<div id="q4_2009">
-	<div id="q3_2009">
-	<div id="q2_2009">
-	<div id="q1_2005">
-		<div id="labels">
-			<ul>
-				<li><span></span>A</li>
-				<li><span></span>B</li>
-				<li><span></span>C</li>
-				<li><span></span>D</li>
-			</ul>
-		</div>
-		<div id="pie_ico">Pie &raquo;</div>
-		<div id="pyr_ico">&laquo; Pyramid</div>
-		<div id="percentage_wrapper">
-			<div id="percentage">
-				<ul>
-				{% for percentage in percentages %}
-				<li><p>{{percentage}}%</p></li>
-              	{% endfor %}
-				</ul>
-			</div>
-		</div>
-		<div id="slider">
-			<div id="chart_holder">
-				<div id="pie_chart">
-					<ul>
-						<li id="c1_r"><p><span class="pie_left"></span></p></li> 	
-						<li id="c1_l"><p><span class="pie_right"></span></p></li>
-						<li id="c2_r"><p><span class="pie_left"></span></p></li> 	
-						<li id="c2_l"><p><span class="pie_right"></span></p></li>
-						<li id="c3_r"><p><span class="pie_left"></span></p></li> 	
-						<li id="c3_l"><p><span class="pie_right"></span></p></li>
-						<li id="c4_r"><p><span class="pie_left"></span></p></li> 	
-						<li id="c4_l"><p><span class="pie_right"></span></p></li>
-						<li id="c5_r"><p><span class="pie_left"></span></p></li> 	
-						<li id="c5_l"><p><span class="pie_right"></span></p></li>
-					</ul>
-				</div>
-				<div id="pyr_chart">
-					<ul>
-						<li></li>
-						<li></li>
-						<li></li>
-						<li></li>
-						<li></li>
-						<li></li>
-						<li></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		<div id="btn_panel">
-			<ul>
-				<li><a href="#q1_2005"><span>Q1</span><span>2005</span></a></li>
-				<li><a href="#q2_2009"><span>Q2</span><span>2009</span></a></li>
-				<li><a href="#q3_2009"><span>Q3</span><span>2009</span></a></li>
-				<li><a href="#q4_2009"><span>Q4</span><span>2009</span></a></li>
-				<li><a href="#q1_2010"><span>Q1</span><span>2010</span></a></li>
-				<li><a href="#q2_2010"><span>Q2</span><span>2010</span></a></li>
-			</ul>
-		</div>
-	</div> <!--q1_2005-->
-	</div> <!--q2_2009-->
-	</div> <!--q3_2009-->
-	</div> <!--q4_2009-->
-	</div> <!--q1_2010-->
-	</div> <!--q2_2010-->
-</div>
-<div id="footer">
-	<div id="about"><p>Statistical data of this chart provided by The <a href="http://www.netapplications.com/">Net Applications</a></p></div>
-	<div id="author"><p>Code by <a href="http://www.ohsean.net">Sean</a> | find me on <a href="http://www.facebook.com/#!/profile.php?id=100001036031905">Facebook</a></p></div>
-</div>
+    $('ul.nav a').on('shown.bs.tab', function (e) {
+        usage_graph.redraw();
+    });
+  </script>
 </body>
 </html>

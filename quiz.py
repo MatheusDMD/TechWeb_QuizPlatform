@@ -145,17 +145,30 @@ def list_quiz():
 @app.route('/stats', methods=['GET','POST'])
 def stats_view():
 	if request.method == 'POST':
+		user_id = request.cookies.get('user_id')
 		question_id = request.form["select"]
 		question = mcquestion.query.get(question_id)
 		answer_list = mcanswer.query.filter_by(question_id=question_id).all()
 		number_answers = [0,0,0,0]
 		for answer in answer_list:
     			number_answers[answer.answer-1] += 1
+		if len(answer_list) == 0:
+			return redirect(url_for('list_quiz'))
 		percentage_answers = [(100*float(x)) / len(answer_list) for x in number_answers]
 		print("AQUI")
 		for i in percentage_answers:
     			print(i)
-	return render_template('stats.html', percentages=percentage_answers)
+		active_list = ['','','','']
+		active_list[question.correct_alt-1]='active'
+		myanswer = None
+		for answer in answer_list:
+			if answer.user_id == user_id:
+				myanswer = answer.answer
+		if myanswer == None:
+			visibility = 'hidden'
+		else:
+			visibility = 'visible'
+	return render_template('stats.html', percentages=percentage_answers,title=question.question,alt1=question.alt1,alt2=question.alt2,alt3=question.alt3,alt4=question.alt4,active=active_list,answer=myanswer,visibility=visibility)
 
 
 
