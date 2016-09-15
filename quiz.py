@@ -20,7 +20,7 @@ class User(db.Model):
 class Quiz(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(100), unique=False)
-	theme = db.Column(db.String(100), unique=False);user_id = db.Column(db.Integer, db.ForeignKey('user.id'));
+	theme = db .Column(db.String(100), unique=False);user_id = db.Column(db.Integer, db.ForeignKey('user.id'));
 
 	def __init__(self,title, theme, user_id):
     	   self.title = title
@@ -68,10 +68,6 @@ class mcanswer(db.Model):
 		self.quiz_id = quiz_id
 		self.question_id = question_id
 
-@app.route('/stats')
-def stats():
-	list_stats = [ 0,1,2,3]
-	return render_template('stats.html', lista=lista_stats)
 
 @app.route('/', methods=['GET', 'POST'])
 def register():
@@ -151,6 +147,15 @@ def stats_view():
 		question_id = request.form["select"]
 		question = mcquestion.query.get(question_id)
 		answer_list = mcanswer.query.filter_by(question_id=question_id).all()
+		number_answers = [0,0,0,0]
+		for answer in answer_list:
+    			number_answers[answer.answer-1] += 1
+		percentage_answers = [(100*float(x)) / len(answer_list) for x in number_answers]
+		print("AQUI")
+		for i in percentage_answers:
+    			print(i)
+	return render_template('stats.html', percentages=percentage_answers)
+
 
 
 @app.route('/userlist')
