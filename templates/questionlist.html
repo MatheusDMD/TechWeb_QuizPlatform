@@ -25,7 +25,15 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
   <![endif]-->
+  <style>
+    a.visible {
+        visibility: visible
+    }
 
+    a.hidden {
+        visibility: hidden
+    }
+  </style>
 </head>
 
 <body>
@@ -65,6 +73,10 @@
       <div class="container">
         <hr>
         <div class="row">
+          <h4>Use: url/quiz/{{quiz_id}} to answer this quiz </h4>
+        </div>
+        <hr>
+        <div class="row">
           <form action="/stats" method="post">
             <select name="select" class="selectpicker form-control">
               {% for row in questions %}
@@ -72,9 +84,13 @@
               {% endfor %}
             </select>
         </div>
+        <br>
+        <div class="row">
             <input class="btn btn btn-success" type=submit value="View"></input>
           </form>
-      <hr>
+          <a href="../question" class="btn btn-primary {{visibility}}" role="button">New +</a>
+        </div>
+          <hr>
       <!-- Footer -->
       <footer>
           <div class="row">

@@ -38,7 +38,7 @@ class dquestion(db.Model):
 
 class mcquestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.String(100), unique=False)
+    question = db.Column(db.String(100), unique=True)
     alt1 = db.Column(db.String(100), unique=False)
     alt2 = db.Column(db.String(100), unique=False)
     alt3 = db.Column(db.String(100), unique=False)
@@ -112,7 +112,7 @@ def create_quiz():
 	   quiz = Quiz(title=title, theme=theme, user_id=user_id)
 	   db.session.add(quiz)
 	   db.session.commit()#return User.query.get(quiz.user_id).email
-	   resp = make_response(render_template('question.html'))
+	   resp = make_response(render_template('question.html',quiz_id=quiz.id,visibility="visible"))
 	   resp.set_cookie('quiz_id', str(quiz.id))
 	   return resp
    return render_template('create.html')
@@ -131,15 +131,16 @@ def create_question():
 		m_question = mcquestion(question=question,alt1=alt1,alt2=alt2,alt3=alt3,alt4=alt4,correct_alt=correct_alt,quiz_id=quiz_id)
 		db.session.add(m_question)
 		db.session.commit()
-		return render_template('index.html')
-	return render_template('question.html')
+		quiz_questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
+		return render_template('questionlist.html',questions=quiz_questions,visibility="visible")
+	return render_template('question.html',visibility="hidden")
 
 @app.route('/quizlist', methods=['GET','POST'])
 def list_quiz():
 	if request.method == 'POST':
 		quiz_id = request.form["select"]
 		quiz_questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
-		return render_template('questionlist.html',questions=quiz_questions)
+		return render_template('questionlist.html',questions=quiz_questions,quiz_id=quiz_id,visibility="visible")
 	else:
 		user_id = request.cookies.get('user_id')
 		quizs = Quiz.query.filter_by(user_id=user_id).all()
@@ -160,44 +161,51 @@ def list_user():
 
 @app.route('/quiz/<quiz_id>', methods=['GET','POST'])
 def answer_quiz(quiz_id):
-	quiz_id2 = quiz_id.split('?')
-	question = mcquestion.query.filter_by(quiz_id=quiz_id2[0]).first()
-	quiz = Quiz.query.get(quiz_id2[0])
 	user_id = request.cookies.get('user_id')
 	if user_id == None:
-	    if request.method == 'POST':
-			mode = request.args.get('mode')
-			if mode=='login':
-				email = request.form["login_email"]
-				password = request.form["login_password"]
-				#voltar pra cá e ler como se
-				login_user = User.query.filter_by(email=email).first()
-				if login_user.password == password:
-					next_page = make_response(render_template('answerquiz.html'))
-					next_page.set_cookie('user_id', str(login_user.id))
-					return next_page
-				else:
-					return 'wrong password'
-			if mode=='register':
-				first_name = request.form["first_name"]
-		        last_name = request.form["last_name"]
-		        email = request.form["email"]
-		     	password = request.form["password"]
-		     	user = User(username=first_name+' '+last_name, email=email, password=password)
-		     	db.session.add(user)
-		     	db.session.commit();next_page2 = make_response(render_template('answerquiz.html'));next_page2.set_cookie('user_id', str(user.id))
-		        return next_page2
-	    return render_template('quicklogin.html')
+	    return "Login first"
 	else:
 		if request.method == 'POST':
+			questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
+			quest = request.form['question']
+			question = mcquestion.query.filter_by(question=quest).first()
+			quiz = Quiz.query.get(quiz_id)
 			answer = request.form['check']
-			user_id = request.cookies.get('user_id')
-			user_answer = mcanswer(answer=answer,user_id=user_id,quiz_id=quiz_id,question_id=1)
+			user_answer = mcanswer(answer=answer,user_id=user_id,quiz_id=quiz_id,question_id=question.id)
 			db.session.add(user_answer)
 			db.session.commit()
-			next_page2 = make_response(render_template('index.html'));next_page2.set_cookie('user_id', str(user_id))
-			return next_page2
+			if len(questions)-1 != questions.index(question):
+				question = questions[questions.index(question)+1]
+				return render_template('answerquiz.html',title=quiz.title,theme=quiz.theme,question=question.question,alt1=question.alt1,alt2=question.alt2,alt3=question.alt3,alt4=question.alt4)
+			else:
+				return redirect(url_for('quiz_done'))
+		questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
+		question = questions[0]
+		quiz = Quiz.query.get(quiz_id)
 		return render_template('answerquiz.html',title=quiz.title,theme=quiz.theme,question=question.question,alt1=question.alt1,alt2=question.alt2,alt3=question.alt3,alt4=question.alt4)
+
+@app.route('/quiz_done')
+def quiz_done():
+	if request.method == "POST":
+		return redirect(url_for('main'))
+	return render_template("quizanswered.html")
+
+@app.route('/myansweredquiz', methods=['GET','POST'])
+def answerquiz_view():
+	if request.method == 'POST':
+		quiz_id = request.form["select"]
+		quiz_questions = mcquestion.query.filter_by(quiz_id=quiz_id).all()
+		return render_template('questionlist.html',questions=quiz_questions,quiz_id=quiz_id,visibility="hidden")
+	else:
+		user_id = request.cookies.get('user_id')
+		myansweredquestions = mcanswer.query.filter_by(user_id=user_id).all()
+		list_of_quiz = []
+		for question in myansweredquestions:
+			if Quiz.query.get(question.quiz_id) not in list_of_quiz:
+				list_of_quiz.append(Quiz.query.get(question.quiz_id))
+			print(question.quiz_id)
+			print(list_of_quiz)
+	return render_template('donequizlist.html',quizs=list_of_quiz)
 
 db.create_all()
 

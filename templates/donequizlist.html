@@ -9,16 +9,22 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Create Question</title>
+  <title>Business Frontpage - Start Bootstrap Template</title>
 
   <!-- Bootstrap Core CSS
-  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Custom CSS -->
-  <!--<link href="css/business-frontpage.css" rel="stylesheet">-->
+  <link href="css/business-frontpage.css" rel="stylesheet"> -->
 
   <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/bootstrap.min.css') }}">
   <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='../static/css/business-frontpage.css') }}">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
 
 </head>
 
@@ -59,34 +65,22 @@
       <div class="container">
         <hr>
         <div class="row">
-          <h2>{{ title }} - {{ theme }}</h2>
-          <br>
-          <form method="post">
-              <h3>{{ question }}</h3>
-              <br>
-              <input type="hidden" name="question" value="{{ question }}">
-              <div class="checkbox">
-                    <input type="radio" name="check" value="1">
-                    <h4>{{ alt1 }}</h4>
-              </div>
-            <div class="checkbox">
-                  <input type="radio" name="check" value="2">
-                  <h4>{{ alt2 }}</h4>
-            </div>
-            <div class="checkbox">
-                  <input type="radio" name="check" value="3">
-                  <h4>{{ alt3 }}</h4>
-            </div>
-            <div class="checkbox">
-                  <input type="radio" name="check" value="4">
-                  <h4>{{ alt4 }}</h4>
-            </div>
-            <br>
-            <p>
-                <input class="btn btn btn-success" type=submit value="next &raquo;"></input>
-            </p>
-        </form>
+          <h3>My Answered Quiz</h3>
         </div>
+        <div class="row">
+          <form method="post">
+            <select name="select" class="selectpicker form-control">
+              {% for row in quizs %}
+              <option href="#" value="{{row.id}}">{{ row.title }}</option>
+              {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div class="row">
+          <input class="btn btn btn-success" type=submit value="View &raquo;"></input>
+          </form>
+        </div>
+      </div>
       <hr>
 
       <!-- Footer -->

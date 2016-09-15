@@ -26,6 +26,15 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
   <![endif]-->
+  <style>
+    h2.visible {
+        visibility: visible
+    }
+
+    h2.hidden {
+        visibility: hidden
+    }
+  </style>
 
 </head>
 
@@ -64,15 +73,20 @@
   </nav>
       <!-- /.row -->
       <div class="container">
+        <br>
+        <div class="row">
+          <h4 class={{visibility}}>Use: url/quiz/{{quiz_id}} to answer this quiz </h4>
+        </div>
         <hr>
         <div class="row">
-          <h3>Create</h3>
+          <h2>Create</h2>
           <form action="../question" method="post">
             <div class="input-group">
               <span class="input-group-addon" id="basic-addon1">Question</span>
               <input type="text" class="form-control" placeholder="Question" name="question" aria-describedby="basic-addon1">
             </div>
               <br>
+              <h5>Check one of the boxes to indicate the correct alternative:<h5>
               <div class="checkbox">
                     <input type="radio" name="check" value="1">
               </div>
