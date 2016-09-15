@@ -155,11 +155,11 @@ def stats_view():
 		if len(answer_list) == 0:
 			return redirect(url_for('list_quiz'))
 		percentage_answers = [(100*float(x)) / len(answer_list) for x in number_answers]
-		print("AQUI")
 		for i in percentage_answers:
     			print(i)
 		active_list = ['','','','']
 		active_list[question.correct_alt-1]='active'
+
 		myanswer = None
 		for answer in answer_list:
 			if answer.user_id == user_id:
