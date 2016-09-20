@@ -54,11 +54,11 @@ a:hover {
   transition: .5s ease;
 }
 .tab-group li a:hover {
-  background: #ff1a1a;
+  background: #00E0B3;
   color: #ffffff;
 }
 .tab-group .active a {
-  background: #ff1a1a;
+  background: #00E0B3;
   color: #ffffff;
 }
 
@@ -163,7 +163,7 @@ textarea {
   -webkit-appearance: none;
 }
 .button:hover, .button:focus {
-  background: #ff1a1a;
+  background: #00E0B3;
 }
 
 .button-block {
